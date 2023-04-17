@@ -90,7 +90,7 @@ app.post("/register", async (req,res)=>{
 
             // Match the password Create and send the token
             if (user && (await bcrypt.compare(password, user.password))) {
-                const token = jwt.sign({id:user._id,name:user.firstname,email},'secret',{expiresIn:'2h'})
+                const token = jwt.sign({id:user._id,name:user.firstname,email},'secret',{expiresIn:'12h'})
             
                 user.password = undefined
                 console.log(token)
@@ -116,7 +116,7 @@ app.post("/register", async (req,res)=>{
 
 app.get("/dashboard", auth, (req,res) => {
     console.log(req.user.name)
-    res.send(`Welcome ${req.user.name}`)    
+    res.send(req.user.name)    
 })
 
 
