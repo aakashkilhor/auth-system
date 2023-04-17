@@ -6,13 +6,11 @@ const bcrypt = require("bcryptjs")
 const cookieParser = require("cookie-parser")
 // Import model
 const User = require("./model/user")
-const cors = require('cors');
 
 const app = express()
 app.use(express.json()) 
 app.use(express.urlencoded({extended:true}))
 app.use(cookieParser())
-// app.use(cors());
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', req.headers.origin);
     res.header('Access-Control-Allow-Credentials', true);
@@ -81,25 +79,26 @@ app.post("/register", async (req,res)=>{
             }
             // Check user existence
             const user = await User.findOne({email})
+            console.log("Hello")
+            console.log(user)
+            console.log("Hi")
             // If user does not exist
+            // console.log(user._id)
             if (!user){
                 res.send("User does not exist")
             }
 
             // Match the password Create and send the token
             if (user && (await bcrypt.compare(password, user.password))) {
-                const token = jwt.sign({id:user._id,email},'secret',{expiresIn:'2h'})
+                const token = jwt.sign({id:user._id,name:user.firstname,email},'secret',{expiresIn:'2h'})
             
                 user.password = undefined
+                console.log(token)
                 // user.token = token
 
-            const options = {
-                expires : new Date(Date.now() + 3*24*60*60*1000),
-                httpOnly : false
-            }
             // res.cookie("token", token, options);
             // console.log("Line 92");
-            res.status(200).cookie("token",token, options).json({
+            res.status(200).cookie("token",token).json({
                 success:true,
                 token,
                 user
@@ -117,7 +116,7 @@ app.post("/register", async (req,res)=>{
 
 app.get("/dashboard", auth, (req,res) => {
     console.log(req.user.name)
-    res.send(`Welcome ${req.user.email}`)    
+    res.send(`Welcome ${req.user.name}`)    
 })
 
 
